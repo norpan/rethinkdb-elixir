@@ -7,31 +7,31 @@ defmodule DateTimeTest do
   alias RethinkDB.Pseudotypes.Time
 
   setup_all do
-    start_link
+    start_link()
     :ok
   end
 
   test "now native" do
-    {:ok, %Record{data: data}} = now |> run
+    {:ok, %Record{data: data}} = now() |> run
     assert %DateTime{} = data
   end
 
   test "now raw" do
-    {:ok, %Record{data: data}} = now |> run [time_format: :raw]
+    {:ok, %Record{data: data}} = now() |> run(time_format: :raw)
     assert %Time{} = data
   end
 
   test "time native" do
     {:ok, %Record{data: data}} = time(1970,1,1,"Z") |> run
     assert data == DateTime.from_unix!(0, :milliseconds)
-    {:ok, %Record{data: data}} = time(1970,1,1,0,0,1,"Z") |> run [binary_format: :native]
+    {:ok, %Record{data: data}} = time(1970,1,1,0,0,1,"Z") |> run(binary_format: :native)
     assert data == DateTime.from_unix!(1000, :milliseconds)
   end
 
   test "time raw" do
-    {:ok, %Record{data: data}} = time(1970,1,1,"Z") |> run [time_format: :raw]
+    {:ok, %Record{data: data}} = time(1970,1,1,"Z") |> run(time_format: :raw)
     assert data.epoch_time == 0
-    {:ok, %Record{data: data}} = time(1970,1,1,0,0,1,"Z") |> run [time_format: :raw]
+    {:ok, %Record{data: data}} = time(1970,1,1,0,0,1,"Z") |> run(time_format: :raw)
     assert data.epoch_time == 1
   end
 
@@ -41,7 +41,7 @@ defmodule DateTimeTest do
   end
 
   test "epoch_time raw" do
-    {:ok, %Record{data: data}} = epoch_time(1) |> run [time_format: :raw]
+    {:ok, %Record{data: data}} = epoch_time(1) |> run(time_format: :raw)
     assert data.epoch_time == 1
     assert data.timezone == "+00:00"
   end
@@ -54,10 +54,10 @@ defmodule DateTimeTest do
   end
 
   test "iso8601 raw" do
-    {:ok, %Record{data: data}} = iso8601("1970-01-01T00:00:00+00:00") |> run [time_format: :raw]
+    {:ok, %Record{data: data}} = iso8601("1970-01-01T00:00:00+00:00") |> run(time_format: :raw)
     assert data.epoch_time == 0
     assert data.timezone == "+00:00"
-    {:ok, %Record{data: data}} = iso8601("1970-01-01T00:00:00", default_timezone: "+01:00") |> run [time_format: :raw]
+    {:ok, %Record{data: data}} = iso8601("1970-01-01T00:00:00", default_timezone: "+01:00") |> run(time_format: :raw)
     assert data.epoch_time == -3600
     assert data.timezone == "+01:00"
   end
@@ -68,7 +68,7 @@ defmodule DateTimeTest do
   end
 
   test "in_timezone raw" do
-    {:ok, %Record{data: data}} = epoch_time(0) |> in_timezone("+01:00") |> run [time_format: :raw]
+    {:ok, %Record{data: data}} = epoch_time(0) |> in_timezone("+01:00") |> run(time_format: :raw)
     assert data.timezone == "+01:00"
     assert data.epoch_time == 0
   end
@@ -94,7 +94,7 @@ defmodule DateTimeTest do
   end
 
   test "date raw" do
-    {:ok, %Record{data: data}} = epoch_time(5) |> date |> run [time_format: :raw]
+    {:ok, %Record{data: data}} = epoch_time(5) |> date |> run(time_format: :raw)
     assert data.epoch_time == 0
   end
 
